@@ -1,0 +1,91 @@
+:host {
+  --primary: #222375;
+  --btn-size: 48px;
+  --wave-height: 36px;
+  --tooltip-bg: rgba(0, 0, 0, 0.8);
+  --tooltip-color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  display: inline-block;
+}
+
+.bfp-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--primary);
+  padding: 0.75rem 1rem;
+  border-radius: 24px;
+}
+
+.bfp-button {
+  background: #ffffff;
+  border: none;
+  color: var(--primary);
+  width: var(--btn-size);
+  height: var(--btn-size);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: transform 0.2s ease;
+}
+
+.bfp-button:hover {
+  transform: scale(1.05);
+}
+
+.bfp-progress {
+  flex: 1;
+  min-width: 160px;
+  height: var(--wave-height);
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+}
+
+.bfp-wave {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Tooltip */
+.bfp-button[data-tooltip]::after,
+.bfp-download[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--tooltip-bg);
+  color: var(--tooltip-color);
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 20;
+}
+
+.bfp-button[data-tooltip]:hover::after,
+.bfp-download[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.bfp-time-total {
+  position: absolute;
+  bottom: 4px;
+  left: 8px;
+  font-size: 0.75rem;
+  color: #ffffff;
+}
