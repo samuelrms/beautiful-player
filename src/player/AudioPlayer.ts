@@ -98,7 +98,18 @@ export class AudioPlayer extends HTMLElement {
         </audio>
         <button class="bfp-button" data-role="play">${icons.play}</button>
         <div class="bfp-progress"><canvas class="bfp-wave"></canvas></div>
-        <span class="bfp-time-total" data-role="duration">0:00</span>
+        <span class="bfp-current" data-role="current">0:00</span>
+
+        <button class="bfp-button" data-role="speed" data-tooltip="Velocidade">1x</button>
+
+        <div class="volume-control">
+          <button class="bfp-button" data-role="volume" data-tooltip="Volume">100%</button>
+          <div class="volume-card">
+            <input type="range" class="volume-range" data-role="volume-range" min="0" max="1" step="0.01" value="1" />
+          </div>
+        </div>
+
+        <a class="bfp-button bfp-download" data-role="download" data-tooltip="Baixar">⬇</a>
       </div>
     `;
 
