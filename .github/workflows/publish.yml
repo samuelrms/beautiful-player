@@ -5,6 +5,9 @@ on:
     tags:
       - "v*.*.*"
 
+permissions:
+  contents: write # permite criar/releases e fazer upload de assets
+
 jobs:
   publish:
     runs-on: ubuntu-latest
