@@ -1,14 +1,14 @@
 {
     "name": "beautiful-player",
     "version": "0.2.0",
-    "description": "Coleção de players de mídia customizáveis (primeiro módulo: áudio estilo WhatsApp)",
+    "description": "Coleção de players de mídia customizáveis (primeiro módulo: áudio estilizado)",
     "keywords": [
         "audio",
         "player",
         "waveform",
         "web-component"
     ],
-    "author": "Seu Nome <email@exemplo.com>",
+    "author": "Samuel Ramos <samuelaoliveiraramos@gmail.com>",
     "license": "MIT",
     "main": "dist/beautiful-player.umd.js",
     "module": "dist/beautiful-player.esm.js",
