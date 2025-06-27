@@ -1,12 +1,8 @@
 # Beautiful Player
 
-<!-- markdownlint-disable MD033 -->
-<p align="center">
-  <img src="docs/photo_demo.png" alt="Beautiful Player screenshot" width="510" />
-  <br/>
-  <video src="docs/video_demo.mp4" autoplay muted loop playsinline width="510"></video>
-</p>
-<!-- markdownlint-enable MD033 -->
+![Beautiful Player screenshot](https://github.com/samuelrms/beautiful-player/blob/main/docs/photo_demo.png?raw=true)
+
+![Beautiful Player demo](https://github.com/samuelrms/beautiful-player/blob/main/docs/video_demo.gif?raw=true)
 
 ---
 
