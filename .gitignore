@@ -15,7 +15,6 @@ dist/
 *.wav
 *.ogg
 *.m4a
-*.mp4
 *.webm
 *.mov
 *.avi
