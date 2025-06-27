@@ -1,126 +1,189 @@
-# Beautiful Player
+# Beautiful Player v0.1.5
 
-Reprodutor de áudio estilo WhatsApp pronto para uso em qualquer framework via Web Component ou função factory.
+Reprodutor de áudio inspirado no WhatsApp, fornecido como **Web Component** com wrappers prontos para **React**, **Vue 3** e **Angular**.
 
-## Instalação
+---
+
+## 1 · Instalação
 
 ```bash
 npm i beautiful-player
 ```
 
-Ou via _unpkg_ direto no navegador:
+Ou, sem build-step, carregue direto do CDN:
 
 ```html
 <script type="module" src="https://unpkg.com/beautiful-player/dist/beautiful-player.esm.js"></script>
 ```
 
-## Uso rápido (HTML)
+---
+
+## 2 · Uso como Web Component (HTML puro)
 
 ```html
+<!-- exemplo completo -->
 <beautiful-audio
-  src="sample.mp3"
-  speeds="1,1.5,2"
-  autoplay
+  src="song.mp3"                 
+  speeds="1,1.25,1.5"
   primary-color="#ff006e"
+  hide-buttons="speed,volume"   
+  icon-play="▶" icon-pause="⏸" icon-download="⬇"
+  autoplay
 ></beautiful-audio>
 ```
 
-## Uso em frameworks
+Atributos disponíveis:
 
-### Usando os wrappers prontos
+| Atributo (WC) | Tipo | Padrão | Descrição |
+|---------------|------|--------|-----------|
+| `src` | `string` | — | Caminho/URL do áudio |
+| `speeds` | `string` | `1,1.5,2` | Lista de velocidades separadas por vírgula |
+| `autoplay` | `boolean` | `false` | Reproduz ao carregar |
+| `primary-color` | `string` | `#222375` | Cor base do player |
+| `hide-buttons` | `string` | — | CSV com `speed,volume,download` |
+| `hide-speed` / `hide-volume` / `hide-download` | `boolean` | — | Alternativa granular a `hide-buttons` |
+| `icon-play` / `icon-pause` / `icon-download` | `string` | (símbolos padrão) | Ícones customizados |
 
-Se preferir componentes idiomáticos, importe o wrapper correspondente:
+### Eventos nativos + `download`
 
-| Framework | Importação | Exemplo |
-|-----------|-----------|---------|
-| React     | `import { BeautifulAudio } from 'beautiful-player/wrappers/react';` | `<BeautifulAudio src="song.mp3" speeds="1,1.25,1.5" />` |
-| Vue 3     | `import { BeautifulAudio } from 'beautiful-player/wrappers/vue';` | `<BeautifulAudio src="song.mp3" speeds="1,1.25,1.5" />` |
-| Angular   | `import { BeautifulPlayerModule } from 'beautiful-player/wrappers/beautiful-player.module';` | `<beautiful-audio src="song.mp3"></beautiful-audio>` |
+O elemento propaga todos os eventos do `<audio>` e emite **`download`** ao clicar no botão:
 
-Os wrappers apenas reexportam o Web Component, mas fornecem tipagem/integração mais confortável em cada ecossistema.
+```js
+audioEl.addEventListener('download', (e)=>{
+  console.log(e.detail.url)       // url do arquivo
+  // e.preventDefault()  // cancela o download nativo
+})
+```
 
-### React (sem wrapper)
+---
 
-```jsx
-import 'beautiful-player/dist/beautiful-player.esm.js';
+## 3 · React
 
-function App() {
+Wrapper tipado em `beautiful-player/wrappers/react`.
+
+```tsx
+import { BeautifulAudio } from 'beautiful-player/wrappers/react';
+
+export default function Demo() {
   return (
-    <beautiful-audio
+    <BeautifulAudio
       src="song.mp3"
-      speeds="1,1.5,2"
-      style={{ width: 350 }}
+      speeds={[1,1.25,1.5]}          // ← array (o wrapper converte)
+      primaryColor="#222375"
+      hideButtons={{ volume:true }}
+      icons={{ play:'▶', pause:'⏸', download:'⬇' }}
+      autoplay
+      onDownload={(e)=>{
+        e.preventDefault();          // opcional
+        console.log('download', e.detail.url);
+      }}
+      style={{ width: 340 }}
     />
   );
 }
 ```
 
-### Vue
-
-```vue
-<script setup>
-import 'beautiful-player/dist/beautiful-player.esm.js'
-</script>
-
-<template>
-  <beautiful-audio src="song.mp3" speeds="1,1.25,1.5" />
-</template>
-```
-
-### Angular
-
-No `app.module.ts` habilite `CUSTOM_ELEMENTS_SCHEMA`:
+Prop-types do wrapper:
 
 ```ts
+interface BeautifulAudioProps {
+  src: string;
+  speeds?: number[];          // array!
+  autoplay?: boolean;
+  primaryColor?: string;
+  hideButtons?: { speed?:boolean; volume?:boolean; download?:boolean };
+  icons?: { play?:string; pause?:string; download?:string };
+  onDownload?: (e: CustomEvent<{url:string}>)=>void;
+  ...nativeDivProps
+}
+```
+
+---
+
+## 4 · Vue 3
+
+```ts
+import { BeautifulAudio } from 'beautiful-player/wrappers/vue';
+```
+
+```vue
+<template>
+  <BeautifulAudio
+    src="song.mp3"
+    :speeds="[1,1.25,1.5]"
+    :hideButtons="{ speed:true, download:true }"
+    :icons="{ play:'▶' }"
+    @download="onDl"
+  />
+</template>
+<script setup lang="ts">
+function onDl(e:any){
+  // e.preventDefault()
+  console.log(e.detail.url)
+}
+</script>
+```
+
+---
+
+## 5 · Angular
+
+```ts
+// app.module.ts
+import { BeautifulPlayerModule } from 'beautiful-player/wrappers/beautiful-player.module';
 import 'beautiful-player/dist/beautiful-player.esm.js';
+
 @NgModule({
+  imports: [BrowserModule, BeautifulPlayerModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppModule {}
 ```
 
-Depois use no template:
-
 ```html
-<beautiful-audio src="song.mp3"></beautiful-audio>
+<!-- app.component.html -->
+<beautiful-audio
+  src="song.mp3"
+  primary-color="#222375"
+  hide-speed
+  (download)="handleDownload($event)">
+</beautiful-audio>
 ```
-
-## Atributos / Props
-
-| Atributo | Tipo | Padrão | Descrição |
-|----------|------|--------|-----------|
-| `src` | string | — | caminho do arquivo de áudio |
-| `speeds` | string | `1,1.5,2` | lista de velocidades separadas por vírgula |
-| `autoplay` | boolean | `false` | inicia a reprodução automaticamente |
-| `primary-color` | string | `#222375` | cor base do player |
-
-## Opções JS (factory)
 
 ```ts
-createAudioPlayer(container, {
+handleDownload(e: CustomEvent<{url:string}>){
+  // e.preventDefault();
+  console.log(e.detail.url);
+}
+```
+
+---
+
+## 6 · Factory JS (opcional)
+
+```ts
+import { createAudioPlayer } from 'beautiful-player';
+
+createAudioPlayer(document.getElementById('box'), {
   src: 'song.mp3',
-  speeds: [1, 1.25, 1.5],
-  maxVolume: 1,
-  icons: { play: '▶️', pause: '⏸️' },
+  speeds: [1,1.5,2],
+  primaryColor: '#ff006e',
+  hideButtons: { download: true },
+  icons: { play:'▶' },
   tooltips: true,
-  hideButtons: { download: true }
-})
+  maxVolume: 1,
+  onDownload: (url)=>console.log(url)
+});
 ```
 
-## Eventos
+---
 
-O elemento dispara eventos nativos do `<audio>` (`play`, `pause`, `ended`, etc.). Ouça normalmente:
-
-```js
-document.querySelector('beautiful-audio').addEventListener('play', () => {})
-```
-
-## Build & Contribuição
+## 7 · Build / Desenvolvimento
 
 ```bash
 npm i
-npm run dev   # watch
+npm run dev   # rollup ‑w
 npm run build # gera dist/
 ```
 
-Pull requests são bem-vindos!
+Contribuições são bem-vindas!
