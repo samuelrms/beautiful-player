@@ -28,7 +28,7 @@
 .bfp-button {
   background: #ffffff;
   border: none;
-  color: var(--primary);
+  color: var(--icon-color, var(--primary));
   width: var(--btn-size);
   height: var(--btn-size);
   border-radius: 50%;
@@ -121,6 +121,7 @@
   height: 6px;
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.35);
+  accent-color: var(--icon-color, var(--primary));
   cursor: pointer;
 }
 
@@ -144,7 +145,7 @@
 
 .bfp-download {
   background: #ffffff;
-  color: var(--primary);
+  color: var(--icon-color, var(--primary));
   text-decoration: none;
   display: flex !important;
   align-items: center;
@@ -185,6 +186,28 @@
 
 .bfp-button[data-tooltip]:hover::after,
 .bfp-download[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.bfp-tt {
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--tooltip-bg);
+  color: var(--tooltip-color);
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 20;
+}
+
+.bfp-tt.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
