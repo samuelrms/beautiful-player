@@ -7,7 +7,7 @@
 ---
 
 [![npm](https://img.shields.io/npm/v/beautiful-player?color=%23222375)](https://www.npmjs.com/package/beautiful-player)
-Custom-made WhatsApp-style **audio player** delivered as a **Web Component** with first-class wrappers for **React**, **Vue 3** and **Angular**.
+Custom-made **audio player** delivered as a **Web Component** with first-class wrappers for **React**, **Vue 3** and **Angular**.
 
 > **Roadmap** · upcoming modules  
 > • Video player 📹  • Voice recorder 🎙  • Stories / playlists 📚
@@ -93,10 +93,102 @@ document.querySelector('beautiful-audio')
 | **Vue 3** | `import { BeautifulAudio } from 'beautiful-player/wrappers/vue'` | `<BeautifulAudio :src="'song.mp3'" :speeds="[1,1.5,2]" />` |
 | **Angular** | `import { BeautifulPlayerModule } from 'beautiful-player/wrappers/beautiful-player.module'` | `<beautiful-audio src="song.mp3"></beautiful-audio>` |
 
-### Common props (wrappers)
+## 4 · Common Props (Wrappers)
 
-| Prop | Type | Notes |
-|------|------|-------|
-| `src` | string | required |
-| `type` | string | MIME hint |
-| `speeds`
+All wrappers (React, Vue, Angular) accept the same set of props/attributes. Only the syntax changes according to the framework.
+
+| Prop         | Type                                 | Default      | Description / Example |
+|--------------|--------------------------------------|--------------|----------------------|
+| `src`        | string                               | —            | Audio URL (required) |
+| `type`       | string                               | —            | MIME hint, e.g. `audio/ogg` |
+| `speeds`     | number[]                             | `[1,1.5,2]`  | Playback rates: `[1,1.25,1.5]` |
+| `autoplay`   | boolean                              | `false`      | Start playback on load |
+| `primaryColor` | string                             | `#222375`    | Brand color (background) |
+| `iconColor`  | string                               | `--primary`  | Icon/text color |
+| `iconSize`   | number \| string                    | `48`         | Icon/button size (px/rem) |
+| `width`/`height` | number \| string                 | —            | Player box size |
+| `hideButtons`| `{ speed?, volume?, download? }`     | —            | Hide controls |
+| `icons`      | `{ play?, pause?, download?, volumeMute?, ... }` | built-in SVGs | Custom icons (SVG, string, or imported) |
+| `tooltips`   | boolean \| object                   | `true`       | `false` disables, object allows per-button (text, HTML, React element, HTMLElement, or function) |
+| `onDownload` | function                             | —            | Receives `CustomEvent<{url:string}>` |
+| Any native audio prop | —                           | —            | e.g. `controls`, `loop`, `preload` |
+
+**Example (React):**
+
+```tsx
+<BeautifulAudio
+  src="song.mp3"
+  speeds={[1, 1.25, 1.5]}
+  type="audio/ogg"
+  primaryColor="#222375"
+  iconColor="#ff006e"
+  iconSize={40}
+  width={400}
+  height={80}
+  hideButtons={{ volume: true }}
+  icons={{ play: <MyPlayIcon />, pause: '<svg>...</svg>', download: '⬇' }}
+  tooltips={{ play: <strong>Play</strong>, download: 'Save file', volume: () => <span>🔊</span> }}
+  controls
+  preload="auto"
+  onDownload={e => console.log(e.detail.url)}
+/>
+```
+
+**Example (Vue):**
+
+```vue
+<BeautifulAudio
+  src="song.mp3"
+  :speeds="[1,1.5,2]"
+  icon-color="#ff006e"
+  icon-size="40"
+  :icons="{ play: '<svg>...</svg>' }"
+  :tooltips="{ volume: 'Volume', download: '<em>Salvar</em>' }"
+  controls
+  preload="auto"
+  @download="handleDl"
+/>
+```
+
+**Example (Angular):**
+
+```html
+<beautiful-audio
+  src="song.mp3"
+  icon-size="40"
+  icon-color="#ff006e"
+  tooltips='{"download":"Save"}'
+  hide-speed
+  controls
+  preload="auto"
+  (download)="onDl($event)"></beautiful-audio>
+```
+
+**Notes:**
+
+- All wrappers forward any unknown prop/attribute to the underlying `<audio>` element.
+- You can use any SVG, string, or imported icon for the `icons` prop.
+- Tooltips accept text, HTML, React/Vue elements, HTMLElements, or functions returning any of these.
+- For advanced theming, use CSS variables (`--primary`, `--icon-color`, `--btn-size`) or `::part` selectors (coming soon).
+
+## 🤝 Contributing
+
+All contributions are welcome — from bug reports and feature requests to pull requests or documentation improvements!
+
+**How to contribute:**
+
+- **Open an issue:** Found a bug, have a question, or want to suggest a feature? [Open an issue](../../issues).
+- **Fork & PR:** Fork the repo, create a branch, and submit a pull request. We review quickly!
+- **Improve docs:** Even typo fixes or better examples are valuable.
+- **Show your work:** Share your use case or integration in Discussions or via an issue.
+
+**Where to find us:**
+
+- **NPM profile:** [samuelramos.dev on npm](https://www.npmjs.com/settings/samuelramos.dev/profile)
+- **GitHub:** [github.com/samuelrms/beautiful-player](https://github.com/samuelrms/beautiful-player)
+
+**Why contribute?**
+
+- Help shape a modern, framework-agnostic audio player for everyone.
+- Get your name in the contributors list.
+- Make open source better for the next dev!
