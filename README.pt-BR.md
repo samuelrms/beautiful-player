@@ -99,9 +99,12 @@ export default function Demo() {
     <BeautifulAudio
       src="song.mp3"
       speeds={[1,1.25,1.5]}
-      icons={{ play:'▶', pause:'⏸', download:'⬇' }}
-      hideButtons={{ volume:true }}
       primaryColor="#222375"
+      iconColor="#ff006e"
+      iconSize={40}
+      hideButtons={{ volume:true }}
+      icons={{ play:'▶', pause:'⏸', download:'⬇' }}
+      tooltips={{ play: <strong>Play</strong>, download: 'Salvar' }}
       onDownload={e => console.log(e.detail.url)}
     />
   );
@@ -122,6 +125,7 @@ function handleDl(e:any){ console.log(e.detail.url) }
     :speeds="[1,1.5,2]"
     :hideButtons="{ download:true }"
     :icons="{ play:'▶' }"
+    :tooltips="{ volume:'Volume', download:'<em>Salvar</em>' }"
     @download="handleDl"
   />
 </template>
@@ -145,9 +149,11 @@ export class AppModule {}
 <!-- template -->
 <beautiful-audio
   src="song.mp3"
+  icon-size="40"
+  icon-color="#ff006e"
+  tooltips='{"download":"Salvar"}'
   hide-speed
-  (download)="onDl($event)"
-></beautiful-audio>
+  (download)="onDl($event)"></beautiful-audio>
 ```
 
 ```ts
@@ -191,3 +197,22 @@ O player usa **CSS Shadow DOM**. Para temas avançados, você pode:
 * ⏳ Stories / playlist
 
 Contribuições e sugestões são bem-vindas!
+
+## 8 · Por que usar o **Beautiful Player**?
+
+| Recurso | Beautiful Player | Players comuns |
+|---------|------------------|----------------|
+| **Multi-framework** | ✅ Web Component + wrappers React / Vue 3 / Angular | ❌ versões separadas |
+| **Estilos encapsulados** | ✅ Shadow DOM — sem vazar CSS | ❌ requer sobrescrever classes globais |
+| **Tamanho** | < 15 kB gz (ESM) | 30–100 kB |
+| **Ícones customizáveis** | Qualquer SVG / texto via props ou exports | Limitado / só em build |
+| **Tooltips dinâmicos** | Texto, HTML, ou elemento React/Vue | Raro suporte |
+| **Visualizador de ondas** | ✅ Barras interativas (Web Audio API) | Normalmente ausente |
+| **TypeScript first** | Tipagem completa (core + wrappers) | Muitos sem tipos |
+| **Zero dependências** | Vanilla TS, nenhum runtime externo | Puxam libs grandes |
+| **Acessibilidade** | Teclado + ARIA prontos | Nem sempre |
+| **Extensível** | API de fábrica + variáveis CSS | UI rígida |
+
+Com o Beautiful Player você adiciona um player moderno e estiloso em QUALQUER stack, troca cor, tamanho, ícones, tooltips e ainda entrega um bundle mínimo e sem dependências. 🚀
+
+---
