@@ -11,3 +11,12 @@ dist
 example-app/
 *.tgz
 dist/
+*.mp3
+*.wav
+*.ogg
+*.m4a
+*.mp4
+*.webm
+*.mov
+*.avi
+*.mkv
