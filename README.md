@@ -37,18 +37,23 @@ CDN (no build-step):
 ></beautiful-audio>
 ```
 
-### Attributes
+### Attributes (Web Component)
 
 | Attribute | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `src` | string | — | Audio URL |
+| `type` | string | — | MIME hint, e.g. `audio/ogg` |
 | `speeds` | string | `1,1.5,2` | Comma-separated playback rates |
-| `autoplay` | boolean | `false` | Start on load |
-| `primary-color` | string | `#222375` | Brand color |
+| `autoplay` | boolean | `false` | Start playback on load |
+| `primary-color` | string | `#222375` | Brand color (background) |
+| `icon-size` | string \| number | `48` | Base icon/button size (w = h) |
+| `icon-color` | string | `--primary` | Icon/text color |
+| `width` / `height` | string \| number | — | Explicit player box size |
 | `hide-buttons` | string | — | CSV `speed,volume,download` |
-| `hide-speed / hide-volume / hide-download` | boolean | — | Individual flags |
-| `icon-play / icon-pause / icon-download` | string | defaults | Custom icons |
-| `tooltips` | boolean | `true` | Show button tooltips |
+| `hide-speed` / `hide-volume` / `hide-download` | boolean | — | Individual flags |
+| `icon-play` / `icon-pause` / `icon-download` | string | built-in SVGs | Override any icon (SVG/text) |
+| `tooltips` | boolean \| JSON | `true` | `false` to disable or JSON object to override (HTML allowed) |
+| `crossorigin` | "anonymous" \| "use-credentials" | — | Enable CORS for wave visualizer |
 
 ### Events
 
@@ -60,6 +65,16 @@ document.querySelector('beautiful-audio')
     console.log(e.detail.url)   // audio file
     // e.preventDefault()       // cancel native download
   })
+```
+
+#### Custom tooltip example
+
+```html
+<beautiful-audio
+  src="song.mp3"
+  icon-size="40"
+  tooltips='{"play":"<strong>Play</strong>","download":"<em>Save file</em>"}'>
+</beautiful-audio>
 ```
 
 ---
@@ -74,15 +89,19 @@ document.querySelector('beautiful-audio')
 
 ### Common props (wrappers)
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `src` | string | Audio URL |
-| `speeds` | number[] | Array of rates (auto-converted) |
-| `primaryColor` | string | Brand color |
-| `hideButtons` | object | Hide controls `{ speed?, volume?, download? }` |
-| `icons` | object | Custom icons `{ play?, pause?, download? }` |
-| `onDownload` | function | Receives `CustomEvent<{url:string}>` |
-| Any native div prop (`style`, …) |
+| Prop | Type | Notes |
+|------|------|-------|
+| `src` | string | required |
+| `type` | string | MIME hint |
+| `speeds` | number[] | `[1,1.5,2]` default |
+| `autoplay` | boolean | — |
+| `primaryColor` / `iconColor` | string | CSS colors |
+| `iconSize` | number \| string | px / rem etc. |
+| `width` / `height` | number \| string | player size |
+| `hideButtons` | `{ speed?, volume?, download? }` | booleans |
+| `icons` | `{ play?, pause?, download?, volumeMute?.. }` | SVG/string |
+| `tooltips` | `boolean` \| `{ play?: Tooltip }` | Tooltip can be **React element** / Vue slot / HTMLElement / string |
+| `onDownload` | `(e) => void` | CustomEvent detail `{url}` |
 
 ---
 
@@ -98,9 +117,12 @@ export default function Demo() {
     <BeautifulAudio
       src="song.mp3"
       speeds={[1,1.25,1.5]}
-      icons={{ play:'▶', pause:'⏸', download:'⬇' }}
-      hideButtons={{ volume:true }}
       primaryColor="#222375"
+      iconColor="#ff006e"
+      iconSize={40}
+      hideButtons={{ volume:true }}
+      icons={{ play:'▶', pause:'⏸', download:'⬇' }}
+      tooltips={{ play: <strong>Play</strong>, download: 'Save file' }}
       onDownload={e => console.log(e.detail.url)}
     />
   );
@@ -121,6 +143,7 @@ function handleDl(e:any){ console.log(e.detail.url) }
     :speeds="[1,1.5,2]"
     :hideButtons="{ download:true }"
     :icons="{ play:'▶' }"
+    :tooltips="{ volume:'Volume', download:'<em>Save</em>' }"
     @download="handleDl"
   />
 </template>
@@ -141,7 +164,13 @@ export class AppModule {}
 ```
 
 ```html
-<beautiful-audio src="song.mp3" hide-speed (download)="onDl($event)"></beautiful-audio>
+<beautiful-audio
+  src="song.mp3"
+  icon-size="40"
+  icon-color="#ff006e"
+  tooltips='{"download":"Save"}'
+  hide-speed
+  (download)="onDl($event)"></beautiful-audio>
 ```
 
 ```ts
@@ -185,3 +214,22 @@ The player lives in **Shadow DOM**. You can:
 * ⏳ Stories / playlist
 
 Pull requests & feedback welcome!
+
+## 8 · Why choose **Beautiful Player**?
+
+| Feature | Beautiful Player | Typical audio widgets |
+|---------|------------------|-----------------------|
+| **Framework-agnostic** | ✅ Web Component + wrappers for React, Vue 3, Angular | ❌ separate builds / rewrites |
+| **Styles 100 % encapsulated** | ✅ Shadow DOM (`:host`) — zero leakage | ❌ needs global CSS overrides |
+| **Size** | < 15 kB gz (ESM) | 30–100 kB |
+| **Customizable icons** | Any SVG / text via props / exported constants | Limited / compile-time only |
+| **Dynamic tooltips** | Text, HTML, even React/Vue elements | Rarely supported |
+| **Wave visualizer** | ✅ Interactive bars with Web Audio API | Usually absent |
+| **TypeScript first** | ✅ Full typings for core + wrappers | Often missing |
+| **No external deps** | Only vanilla TS → zero runtime dep | Many pull heavy libs |
+| **Accessible** | Keyboard shortcuts, ARIA labels | Not guaranteed |
+| **Extensible** | Factory API & CSS variables for theming | Hard-wired UI |
+
+Beautiful Player lets you drop a modern, beautiful audio player in ANY tech stack, skin it with your brand color, swap icons, control every tooltip and still ship a tiny, dependency-free bundle. 🚀
+
+---
