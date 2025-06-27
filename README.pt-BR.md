@@ -175,6 +175,16 @@ Todos os wrappers (React, Vue, Angular) aceitam o mesmo conjunto de props/atribu
 
 ---
 
+## 👨‍💻 Autor
+
+**Samuel Ramos**  
+
+- **NPM:** [samuelramos.dev](https://www.npmjs.com/settings/samuelramos.dev/profile)
+- **GitHub:** [@samuelrms](https://github.com/samuelrms)
+- **Website:** [samuelramos.dev](https://samuelramos.dev)
+
+---
+
 ## 🤝 Contribua
 
 Toda contribuição é bem-vinda — desde reportar bugs e sugerir features até enviar pull requests ou melhorar a documentação!
