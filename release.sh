@@ -25,10 +25,10 @@ case $choice in
 esac
 
 echo "📦 Rodando build antes do versionamento..."
-npm run build
+pnpm run build
 
 echo "🏷 Fazendo bump de versão: $VERSION_TYPE..."
-npm version $VERSION_TYPE
+pnpm version $VERSION_TYPE
 
 echo "📤 Enviando commit e tag para o repositório remoto..."
 git push origin main
