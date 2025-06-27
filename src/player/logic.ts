@@ -1,3 +1,4 @@
+import { volumeHighSvg, volumeLowSvg, volumeMediumSvg, volumeMuteSvg } from '../icons/volume';
 import type { AudioPlayerOptions } from './AudioPlayer';
 
 export function initPlayer(root: ShadowRoot, opts: AudioPlayerOptions) {
@@ -17,8 +18,17 @@ export function initPlayer(root: ShadowRoot, opts: AudioPlayerOptions) {
         play: opts.icons?.play || '►',
         pause: opts.icons?.pause || '❚❚'
     };
+
+    const setIcon = (el: HTMLElement, icon: string) => {
+        if (icon.trim().startsWith('<')) {
+            el.innerHTML = icon;
+        } else {
+            el.textContent = icon;
+        }
+    };
+
     const updatePlayIcon = () => {
-        playBtn.textContent = audio.paused ? icons.play : icons.pause;
+        setIcon(playBtn, audio.paused ? icons.play : icons.pause);
     };
     playBtn.addEventListener('click', () => {
         audio.paused ? audio.play() : audio.pause();
@@ -48,24 +58,67 @@ export function initPlayer(root: ShadowRoot, opts: AudioPlayerOptions) {
         audio.volume = maxVol;
         volumeRange.value = String(maxVol);
 
-        const showSlider = () => {
-            root.querySelector('.bfp-volume-card')?.classList.add('active');
-        };
-        const hideSlider = () => {
-            root.querySelector('.bfp-volume-card')?.classList.remove('active');
+        const volIcons = {
+            mute: opts.icons?.volumeMute || volumeMuteSvg,
+            low: opts.icons?.volumeLow || volumeLowSvg,
+            medium: opts.icons?.volumeMedium || volumeMediumSvg,
+            high: opts.icons?.volumeHigh || volumeHighSvg
         };
 
+        const updateVolumeIcon = () => {
+            const v = audio.volume;
+            let icon = volIcons.high;
+            if (v === 0) icon = volIcons.mute;
+            else if (v <= 0.33) icon = volIcons.low;
+            else if (v <= 0.66) icon = volIcons.medium;
+            setIcon(volumeBtn, icon);
+        };
+        updateVolumeIcon();
+
+        const volumeWrapper = root.querySelector('.bfp-volume-control');
+        const showSlider = () => volumeWrapper?.classList.add('active');
+        const hideSlider = () => volumeWrapper?.classList.remove('active');
+
         let sliderVisible = false;
+        let lastVolume = audio.volume; // remember previous non-zero volume
         volumeBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             sliderVisible = !sliderVisible;
             sliderVisible ? showSlider() : hideSlider();
         });
+
+        // Double-click mutes
+        volumeBtn.addEventListener('dblclick', (e) => {
+            e.stopPropagation();
+            if (audio.volume === 0) {
+                // restore
+                audio.volume = lastVolume || maxVol;
+            } else {
+                lastVolume = audio.volume || maxVol;
+                audio.volume = 0;
+            }
+            volumeRange.value = String(audio.volume);
+            updateVolumeIcon();
+            updateSliderBg();
+        });
+
+        const updateSliderBg = () => {
+            const percent = audio.volume * 100;
+            volumeRange.style.background = `linear-gradient(to right, var(--icon-color, var(--primary)) 0%, var(--icon-color, var(--primary)) ${percent}%, rgba(255,255,255,0.35) ${percent}%, rgba(255,255,255,0.35) 100%)`;
+        };
+        updateSliderBg();
+
         volumeRange.addEventListener('input', (e) => {
             const val = Number((e.target as HTMLInputElement).value);
             audio.volume = val;
-            volumeBtn.textContent = `${Math.round(val * 100)}%`;
+            if (val > 0) lastVolume = val;
+            updateVolumeIcon();
+            updateSliderBg();
         });
+
+        // keep in sync when volume changed elsewhere
+        audio.addEventListener('volumechange', updateSliderBg);
+
         document.addEventListener('click', () => {
             sliderVisible = false;
             hideSlider();
@@ -77,9 +130,9 @@ export function initPlayer(root: ShadowRoot, opts: AudioPlayerOptions) {
         downloadA.href = opts.src;
         downloadA.setAttribute('download', '');
 
-        // Dispara evento para que o usuário possa interceptar
+        // Dispatch a custom event so the host application can intercept it
         downloadA.addEventListener('click', (e) => {
-            // Permite que o host cancele comportamento padrão
+            // Allow the host to cancel the default behavior
             const ev = new CustomEvent('download', {
                 detail: { url: opts.src },
                 bubbles: true,
@@ -87,7 +140,7 @@ export function initPlayer(root: ShadowRoot, opts: AudioPlayerOptions) {
             });
             const canceled = !root.host.dispatchEvent(ev);
             if (canceled) {
-                // se usuário cancelou, impedir navegação padrão
+                // If the host canceled, prevent the default navigation
                 e.preventDefault();
             }
         });
@@ -139,17 +192,23 @@ export function initPlayer(root: ShadowRoot, opts: AudioPlayerOptions) {
 
     function initAnalyzer() {
         if (audioCtx) return;
-        audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 512;
-        const source = audioCtx.createMediaElementSource(audio);
-        source.connect(analyser);
-        analyser.connect(audioCtx.destination);
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        try {
+            audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 512;
+            const source = audioCtx.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+        } catch (err) {
+            console.warn('Audio analyzer disabled (possibly due to cross-origin restrictions):', err);
+            audioCtx = undefined as any; // mark as not available
+        }
     }
 
     function drawWave() {
         animationId = requestAnimationFrame(drawWave);
+        if (!analyser) return;
         analyser.getByteFrequencyData(dataArray);
         waveCtx.clearRect(0, 0, waveCanvas.width, waveCanvas.height);
         const gap = 1, barWidth = 2, numBars = Math.min(Math.floor(waveCanvas.width / (barWidth + gap)), dataArray.length);
@@ -197,7 +256,41 @@ export function initPlayer(root: ShadowRoot, opts: AudioPlayerOptions) {
     window.addEventListener('mouseup', () => seeking = false);
 
     /* ---------- Tooltips ---------- */
-    if (!opts.tooltips) {
+    if (opts.tooltips === false) {
         root.querySelectorAll('[data-tooltip]').forEach(el => el.removeAttribute('data-tooltip'));
+    } else if (opts.tooltips && typeof opts.tooltips === 'object') {
+        const map: Record<string, any> = opts.tooltips as any;
+
+        // create single tooltip element
+        const tip = document.createElement('div');
+        tip.className = 'bfp-tt';
+        root.appendChild(tip);
+
+        const showTip = (btn: HTMLElement, content: any) => {
+            let node: string | HTMLElement = content;
+            if (typeof content === 'function') node = content();
+
+            tip.innerHTML = '';
+            if (node instanceof HTMLElement) {
+                tip.appendChild(node.cloneNode(true));
+            } else if (typeof node === 'string') {
+                if (node.trim().startsWith('<')) tip.innerHTML = node;
+                else tip.textContent = node;
+            }
+            const rect = btn.getBoundingClientRect();
+            const hostRect = (root.host as HTMLElement).getBoundingClientRect();
+            tip.style.left = `${rect.left - hostRect.left + rect.width / 2}px`;
+            tip.classList.add('show');
+        };
+        const hideTip = () => tip.classList.remove('show');
+
+        Object.entries(map).forEach(([role, text]) => {
+            const el = root.querySelector(`[data-role="${role}"]`) as HTMLElement | null;
+            if (!el || !text) return;
+            // remove default pseudo tooltip to avoid overlap
+            el.removeAttribute('data-tooltip');
+            el.addEventListener('mouseenter', () => showTip(el, text));
+            el.addEventListener('mouseleave', hideTip);
+        });
     }
 } 
