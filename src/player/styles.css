@@ -1,10 +1,16 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 :host {
   --primary: #222375;
   --btn-size: 48px;
   --wave-height: 36px;
   --tooltip-bg: rgba(0, 0, 0, 0.8);
   --tooltip-color: #fff;
-  font-family: Arial, Helvetica, sans-serif;
   display: inline-block;
 }
 
@@ -16,6 +22,7 @@
   background: var(--primary);
   padding: 0.75rem 1rem;
   border-radius: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .bfp-button {
@@ -25,12 +32,14 @@
   width: var(--btn-size);
   height: var(--btn-size);
   border-radius: 50%;
+  font-size: 14px;
   cursor: pointer;
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
   transition: transform 0.2s ease;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .bfp-button:hover {
@@ -41,10 +50,10 @@
   flex: 1;
   min-width: 160px;
   height: var(--wave-height);
-  background: rgba(255, 255, 255, 0.15);
   border-radius: 6px;
   cursor: pointer;
   position: relative;
+  display: block !important;
 }
 
 .bfp-wave {
@@ -54,6 +63,104 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
+}
+
+.bfp-current {
+  font-size: 0.85rem;
+  color: #ffffff;
+  min-width: 40px;
+  text-align: right;
+  display: inline-block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.bfp-time-total {
+  position: absolute;
+  bottom: 4px;
+  left: 8px;
+  font-size: 0.75rem;
+  color: #ffffff;
+  display: inline-block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.bfp-volume-control {
+  position: relative;
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.bfp-volume-card {
+  display: none;
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  padding: 4px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.bfp-volume-card .bfp-volume-range {
+  width: 100px;
+  display: block;
+}
+
+.bfp-volume-control.active .bfp-volume-card {
+  display: block;
+}
+
+.bfp-volume-range {
+  -webkit-appearance: none;
+  width: 90px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+}
+
+.bfp-volume-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.bfp-volume-range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.bfp-download {
+  background: #ffffff;
+  color: var(--primary);
+  text-decoration: none;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: var(--btn-size);
+  height: var(--btn-size);
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.bfp-download:hover {
+  transform: scale(1.05);
 }
 
 /* Tooltip */
@@ -80,12 +187,4 @@
 .bfp-download[data-tooltip]:hover::after {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
-}
-
-.bfp-time-total {
-  position: absolute;
-  bottom: 4px;
-  left: 8px;
-  font-size: 0.75rem;
-  color: #ffffff;
 }
