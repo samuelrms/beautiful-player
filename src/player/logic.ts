@@ -4,7 +4,6 @@ export function initPlayer(root: ShadowRoot, opts: AudioPlayerOptions) {
     const audio = root.querySelector('audio') as HTMLAudioElement;
     const playBtn = root.querySelector('[data-role="play"]') as HTMLButtonElement;
     const currentTimeEl = root.querySelector('[data-role="current"]') as HTMLSpanElement | null;
-    const durationEl = root.querySelector('[data-role="duration"]') as HTMLSpanElement;
     const speedBtn = root.querySelector('[data-role="speed"]') as HTMLButtonElement | null;
     const volumeBtn = root.querySelector('[data-role="volume"]') as HTMLButtonElement | null;
     const volumeRange = root.querySelector('[data-role="volume-range"]') as HTMLInputElement | null;
@@ -50,10 +49,10 @@ export function initPlayer(root: ShadowRoot, opts: AudioPlayerOptions) {
         volumeRange.value = String(maxVol);
 
         const showSlider = () => {
-            root.querySelector('.volume-card')?.classList.add('active');
+            root.querySelector('.bfp-volume-card')?.classList.add('active');
         };
         const hideSlider = () => {
-            root.querySelector('.volume-card')?.classList.remove('active');
+            root.querySelector('.bfp-volume-card')?.classList.remove('active');
         };
 
         let sliderVisible = false;
@@ -76,6 +75,22 @@ export function initPlayer(root: ShadowRoot, opts: AudioPlayerOptions) {
     /* ---------- Download ---------- */
     if (downloadA) {
         downloadA.href = opts.src;
+        downloadA.setAttribute('download', '');
+
+        // Dispara evento para que o usuário possa interceptar
+        downloadA.addEventListener('click', (e) => {
+            // Permite que o host cancele comportamento padrão
+            const ev = new CustomEvent('download', {
+                detail: { url: opts.src },
+                bubbles: true,
+                cancelable: true,
+            });
+            const canceled = !root.host.dispatchEvent(ev);
+            if (canceled) {
+                // se usuário cancelou, impedir navegação padrão
+                e.preventDefault();
+            }
+        });
     }
 
     /* ---------- Durations ---------- */
@@ -84,9 +99,6 @@ export function initPlayer(root: ShadowRoot, opts: AudioPlayerOptions) {
         const s = Math.floor(t % 60).toString().padStart(2, '0');
         return `${m}:${s}`;
     };
-    audio.addEventListener('loadedmetadata', () => {
-        durationEl.textContent = fmt(audio.duration);
-    });
     if (currentTimeEl) {
         audio.addEventListener('timeupdate', () => {
             currentTimeEl.textContent = fmt(audio.currentTime);
