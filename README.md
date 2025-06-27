@@ -171,6 +171,18 @@ All wrappers (React, Vue, Angular) accept the same set of props/attributes. Only
 - Tooltips accept text, HTML, React/Vue elements, HTMLElements, or functions returning any of these.
 - For advanced theming, use CSS variables (`--primary`, `--icon-color`, `--btn-size`) or `::part` selectors (coming soon).
 
+---
+
+## 👨‍💻 Author
+
+**Samuel Ramos**  
+
+- **NPM:** [samuelramos.dev](https://www.npmjs.com/settings/samuelramos.dev/profile)
+- **GitHub:** [@samuelrms](https://github.com/samuelrms)
+- **Website:** [samuelramos.dev](https://samuelramos.dev)
+
+---
+
 ## 🤝 Contributing
 
 All contributions are welcome — from bug reports and feature requests to pull requests or documentation improvements!
